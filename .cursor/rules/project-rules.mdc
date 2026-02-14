@@ -1,0 +1,55 @@
+---
+alwaysApply: true
+---
+
+# NutriTrack v2 - Hard Rules
+
+These rules apply to ALL future changes in NutriTrack v2. They are non-negotiable unless explicitly overridden.
+
+## Code Quality & Review
+
+- **Small, reviewable diffs only**: No giant refactors unless explicitly requested. Break large changes into smaller, incremental PRs.
+- **TypeScript strict mode**: Always use TypeScript strict mode. No `any` types unless explicitly justified with a comment explaining why.
+
+## Data Storage
+
+- **No core product data in localStorage/AsyncStorage**: Only tiny UI preferences (like theme preference) are allowed. Use AsyncStorage for simple prefs (e.g., theme), or expo-secure-store for secrets. All product data (diary entries, workouts, user data) must be stored in Firestore.
+- **Firestore is source of truth**: Use Firestore offline persistence for all product data. Local "draft" state is fine for UI, but persisted product data must be in Firestore.
+
+## Architecture
+
+- **Offline-first architecture**: Firestore is the source of truth. Use Firestore's built-in offline persistence. All core flows must work offline (add diary entry offline, then sync when online).
+- **One auth system only**: Firebase Auth is the ONLY authentication system. No Supabase, no backend+firebase fallbacks, no multiple auth providers. One system only.
+- **React Native Firebase (native SDK) required**: Must use `@react-native-firebase/app`, `@react-native-firebase/auth`, and `@react-native-firebase/firestore`. This requires a custom dev client / EAS build. Expo Go cannot be used.
+
+## UI Requirements
+
+- **Every screen must include loading/empty/error states**: All screens must handle:
+  - Loading state (while fetching data)
+  - Empty state (when no data exists)
+  - Error state (when operations fail)
+- **Sync status indicator**: UI must show sync status: "Synced" (green), "Syncing" (yellow), or "Offline" (red/gray).
+
+## Dependencies & Configuration
+
+- **No new dependencies without explicit approval**: Do not add new npm packages without explicit user approval. Check if existing dependencies can solve the problem first.
+- **Environment variables must be validated at runtime**: All required environment variables must be validated at app startup. Show a clear error screen if any are missing (do not silently fail).
+
+## Testing
+
+- **Always update or add tests for core logic changes**: 
+  - At minimum: Unit tests for core logic
+  - For critical flows: E2E smoke tests
+  - Tests must be included in the same PR as the feature
+
+## Documentation
+
+- **Always explain verification steps after implementation**: After implementing any change, provide clear steps on how to verify the change works correctly, including:
+  - How to test the feature
+  - How to test offline behavior
+  - How to verify error states
+
+## References
+
+- See [V2_BLUEPRINT.md](mdc:docs/V2_BLUEPRINT.md) for architecture details
+- See [FEATURE_TICKET_TEMPLATE.md](mdc:docs/FEATURE_TICKET_TEMPLATE.md) for ticket format requirements
